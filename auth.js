@@ -81,7 +81,7 @@ const signup=async(req,res)=>
         try
         {
             await client.query('BEGIN');
-const {name,email,password}=req.body;
+const {name,email,password,otp}=req.body;
  const storedOtp = otpCache.get(email);
  if (!storedOtp || storedOtp !== otp) {
   return res.status(400).send({ message: "Invalid or expired OTP" });
