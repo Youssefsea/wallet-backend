@@ -17,23 +17,23 @@ const sendOTPEmail = async(req,res) => {
   try {
     console.log("Send OTP request received:", req.body);
     
-    const {email, phone} = req.body;
+    const {email} = req.body;
     
-    if (!email || !phone) {
+    if (!email ) {
       return res.status(400).json({ 
-        message: "Email and phone are required" 
+        message: "Email is required" 
       });
     }
     
     const result = await data.query(
-      "SELECT id FROM users WHERE email = $1 OR phone = $2",
-      [email, phone]
+      "SELECT id FROM users WHERE email = $1 ",
+      [email]
     );
     
     const existing = result.rows;
     if (existing.length > 0) {
       return res.status(409).json({ 
-        message: "Email or phone already exists" 
+        message: "Email already exists" 
       });
     }
     
