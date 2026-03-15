@@ -1,11 +1,78 @@
 const pool=require('./db');
 const bcrypt=require('bcrypt');
 const JWT=require('./middelware/JwtMake');
-
+const {sendEmail}=require('./middelware/sendOtp');
+const NodeCache = require("node-cache");
+const crypto = require('crypto');
 // --- Validation Helpers ---
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isStrongPassword = (pw) => typeof pw === 'string' && pw.length >= 8;
 const isValidName = (name) => typeof name === 'string' && name.trim().length >= 2 && name.trim().length <= 50;
+
+
+
+const otpCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
+
+const sendOTPEmail = async(req,res) => {
+  try {
+    console.log("Send OTP request received:", req.body);
+    
+    const {email, phone} = req.body;
+    
+    if (!email || !phone) {
+      return res.status(400).json({ 
+        message: "Email and phone are required" 
+      });
+    }
+    
+    const result = await data.query(
+      "SELECT id FROM users WHERE email = $1 OR phone = $2",
+      [email, phone]
+    );
+    
+    const existing = result.rows;
+    if (existing.length > 0) {
+      return res.status(409).json({ 
+        message: "Email or phone already exists" 
+      });
+    }
+    
+    // Generate OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    console.log(`Generated OTP for ${email}: ${otp}`);
+    
+    otpCache.set(email, otp);
+    
+    await sendEmail(email, otp);
+    console.log(`OTP sent successfully to ${email}`);
+    
+    return res.status(200).json({ 
+      message: "OTP sent to your email successfully" 
+    });
+    
+  } catch(err) {
+    console.error("Error in sendOTPEmail:", err);
+    
+    // More specific error messages
+    if (err.message.includes('connect ECONNREFUSED')) {
+      return res.status(500).json({ 
+        message: "Database connection failed" 
+      });
+    }
+    
+    if (err.message.includes('Invalid login')) {
+      return res.status(500).json({ 
+        message: "Email service configuration error" 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: "Failed to send OTP. Please try again." 
+    });
+  }
+};
+
+
 
 const signup=async(req,res)=>
     {
@@ -15,8 +82,13 @@ const signup=async(req,res)=>
         {
             await client.query('BEGIN');
 const {name,email,password}=req.body;
+ const storedOtp = otpCache.get(email);
+ if (!storedOtp || storedOtp !== otp) {
+  return res.status(400).send({ message: "Invalid or expired OTP" });
+}
+   otpCache.del(email);
 console.log('Signup Request:', {name, email}); // Debug log
-// Input validation
+
 if (!name || !isValidName(name)) {
     await client.query('ROLLBACK');
     return res.status(400).json({message:'Name must be between 2 and 50 characters'});
@@ -38,6 +110,8 @@ if(userExit.rows.length>0)
     return res.status(409).json({message:'User already exists'});
 }
 const hashedPassword=await bcrypt.hash(password.toString(),12);
+
+
 
 const newUser=await client.query('INSERT INTO users (name,email,password) VALUES ($1,$2,$3) RETURNING id, name, email, created_at',[name.trim(),email.toLowerCase().trim(),hashedPassword]);
 
@@ -92,6 +166,8 @@ res.status(201).json({message:'User created successfully',user:newUser.rows[0],w
             res.status(500).json({message:'Internal server error'});
         }
     };
+
+
 
 
 const profile=async(req,res)=>
@@ -249,4 +325,4 @@ catch(err)
 
         
 
-module.exports={signup,login,profile,updateProfile,ChangePassword, walletsInfo, makeLocalWallet, getLocalWallets};
+module.exports={signup,login,profile,updateProfile,ChangePassword, walletsInfo, makeLocalWallet, getLocalWallets,sendOTPEmail};

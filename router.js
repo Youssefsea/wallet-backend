@@ -7,6 +7,7 @@ const depositAndWithdraw=require('./depositAndWithdraw');
 const categoriesAndBudgets=require('./categories&Budgets');
 // Auth (public)
 router.post('/auth/signup',auth.signup);
+router.post('/auth/send-otp',auth.sendOTPEmail);
 router.post('/auth/login',auth.login);
 
 // User (protected)
