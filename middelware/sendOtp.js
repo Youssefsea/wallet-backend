@@ -16,7 +16,7 @@ async function sendEmail(to, OTP) {
     });
 
 const otpDigits = OTP.toString().split('').map(d =>
-  `<span style="display:inline-block;width:44px;height:52px;background:rgba(212,175,55,0.1);border:1.5px solid rgba(212,175,55,0.35);border-radius:10px;font-size:26px;font-weight:700;color:#D4AF37;line-height:52px;text-align:center;font-family:monospace;">${d}</span>`
+  `<div style="flex:0 0 auto;width:clamp(36px,10vw,46px);height:clamp(44px,12vw,54px);background:rgba(212,175,55,0.1);border:1.5px solid rgba(212,175,55,0.35);border-radius:10px;font-size:clamp(20px,5vw,26px);font-weight:700;color:#D4AF37;display:inline-flex;align-items:center;justify-content:center;font-family:monospace;">${d}</div>`
 ).join('');
 
 let info = await transporter.sendMail({
@@ -50,9 +50,9 @@ let info = await transporter.sendMail({
 
       <div style="background:#0D2B0F;border-radius:14px;padding:1.75rem;text-align:center;margin-bottom:1.75rem;">
         <p style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:3px;margin:0 0 1rem;">رمز التحقق OTP</p>
-        <div style="display:flex;justify-content:center;gap:8px;">
-          ${otpDigits}
-        </div>
+     <div style="display:flex;justify-content:center;gap:6px;direction:ltr;">
+  ${otpDigits}
+</div>
         <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:12px 0 0;">⏱ ينتهي خلال 10 دقائق</p>
       </div>
 
