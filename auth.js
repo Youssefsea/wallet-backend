@@ -25,7 +25,7 @@ const sendOTPEmail = async(req,res) => {
       });
     }
     
-    const result = await data.query(
+    const result = await pool.query(
       "SELECT id FROM users WHERE email = $1 ",
       [email]
     );
