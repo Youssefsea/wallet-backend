@@ -16,7 +16,13 @@ async function sendEmail(to, OTP) {
     });
 
 const otpDigits = OTP.toString().split('').map(d =>
-  `<div style="flex:0 0 auto;width:clamp(36px,10vw,46px);height:clamp(44px,12vw,54px);background:rgba(212,175,55,0.1);border:1.5px solid rgba(212,175,55,0.35);border-radius:10px;font-size:clamp(20px,5vw,26px);font-weight:700;color:#D4AF37;display:inline-flex;align-items:center;justify-content:center;font-family:monospace;">${d}</div>`
+  `<td style="padding:0 4px;">
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+      <tr>
+        <td style="width:44px;height:54px;background:#1a3d1c;border:2px solid #D4AF37;border-radius:12px;text-align:center;vertical-align:middle;font-size:26px;font-weight:700;color:#D4AF37;font-family:'Courier New',monospace;letter-spacing:0;">${d}</td>
+      </tr>
+    </table>
+  </td>`
 ).join('');
 
 let info = await transporter.sendMail({
@@ -28,49 +34,130 @@ let info = await transporter.sendMail({
 <html dir="rtl" lang="ar">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="margin:0;padding:20px;background:#F6F8F6;font-family:'Cairo',sans-serif;direction:rtl;">
-  <div style="max-width:520px;margin:0 auto;background:#FFFFFF;border-radius:16px;overflow:hidden;border:1px solid #E5E7EB;">
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Cairo','Segoe UI',Tahoma,sans-serif;direction:rtl;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0a0a0a;padding:30px 10px;">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0" width="520" style="max-width:520px;background:#111111;border-radius:20px;overflow:hidden;border:1px solid #222222;">
 
-    <div style="background:linear-gradient(135deg,#1C5F20,#144317);padding:2rem;text-align:center;">
-      <p style="color:#D4AF37;font-size:22px;font-weight:700;margin:0 0 1.5rem;">WealthWise 💳</p>
-      <div style="width:68px;height:68px;background:rgba(212,175,55,0.15);border-radius:50%;margin:0 auto 1rem;display:inline-flex;align-items:center;justify-content:center;border:2px solid rgba(212,175,55,0.4);">
-        <span style="font-size:28px;">🔐</span>
-      </div>
-      <p style="color:rgba(255,255,255,0.5);font-size:12px;letter-spacing:2px;margin:0;">التحقق من الهوية</p>
-    </div>
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0D2B0F 0%,#1C5F20 50%,#0D2B0F 100%);padding:40px 30px 35px;text-align:center;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom:20px;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width:70px;height:70px;background:linear-gradient(135deg,#D4AF37,#B8962E);border-radius:50%;text-align:center;vertical-align:middle;">
+                          <span style="font-size:32px;line-height:70px;">&#x1F4B3;</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size:28px;font-weight:700;color:#D4AF37;letter-spacing:2px;padding-bottom:8px;font-family:'Cairo','Segoe UI',sans-serif;">WealthWise</td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size:11px;color:rgba(212,175,55,0.6);letter-spacing:4px;text-transform:uppercase;">SECURE VERIFICATION</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-    <div style="padding:2rem;">
-      <h2 style="font-size:20px;font-weight:700;color:#1A1A1A;margin:0 0 0.75rem;">مرحباً! 👋</h2>
-      <p style="font-size:14px;color:#6B7280;line-height:1.8;margin:0 0 1.75rem;">
-        تلقّينا طلبًا للتحقق من هويتك على منصة <strong style="color:#1C5F20;">WealthWise</strong>.
-        الرمز صالح لمدة <strong style="color:#1A1A1A;">10 دقائق</strong> فقط.
-      </p>
+          <!-- Divider line -->
+          <tr>
+            <td style="height:3px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);"></td>
+          </tr>
 
-      <div style="background:#0D2B0F;border-radius:14px;padding:1.75rem;text-align:center;margin-bottom:1.75rem;">
-        <p style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:3px;margin:0 0 1rem;">رمز التحقق OTP</p>
-     <div style="display:flex;justify-content:center;gap:6px;direction:ltr;">
-  ${otpDigits}
-</div>
-        <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:12px 0 0;">⏱ ينتهي خلال 10 دقائق</p>
-      </div>
+          <!-- Body -->
+          <tr>
+            <td style="padding:35px 30px 30px;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="font-size:22px;font-weight:700;color:#ffffff;padding-bottom:10px;font-family:'Cairo','Segoe UI',sans-serif;">&#x1F44B; !مرحبا</td>
+                </tr>
+                <tr>
+                  <td style="font-size:14px;color:#888888;line-height:1.9;padding-bottom:30px;font-family:'Cairo','Segoe UI',sans-serif;">
+                    تلقّينا طلبا للتحقق من هويتك على منصة <strong style="color:#D4AF37;">WealthWise</strong>.
+                    استخدم الرمز التالي لاكمال عملية التحقق.
+                  </td>
+                </tr>
+              </table>
 
-      <div style="background:#FFFBEB;border:1px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-bottom:1.75rem;">
-        <p style="font-size:12px;color:#92400e;margin:0;line-height:1.7;">
-          ⚠️ إذا لم تطلب هذا الرمز، يُرجى تجاهل هذا الإيميل وتأمين حسابك فورًا.
-        </p>
-      </div>
+              <!-- OTP Box -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0D2B0F;border-radius:16px;border:1px solid rgba(212,175,55,0.2);">
+                <tr>
+                  <td style="padding:30px 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td align="center" style="font-size:11px;color:rgba(212,175,55,0.5);letter-spacing:4px;padding-bottom:18px;text-transform:uppercase;">&#x1F512; رمز التحقق</td>
+                      </tr>
+                      <tr>
+                        <td align="center">
+                          <table cellpadding="0" cellspacing="0" border="0" dir="ltr" style="margin:0 auto;">
+                            <tr>
+                              ${otpDigits}
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center" style="padding-top:18px;">
+                          <table cellpadding="0" cellspacing="0" border="0" style="background:rgba(212,175,55,0.1);border-radius:20px;margin:0 auto;">
+                            <tr>
+                              <td style="padding:6px 16px;font-size:12px;color:#D4AF37;font-family:'Cairo','Segoe UI',sans-serif;">&#x23F1; صالح لمدة <strong>10 دقائق</strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-      <div style="border-top:1px solid #EEEEEE;padding-top:1.25rem;text-align:center;">
-        <p style="font-size:11px;color:#9CA3AF;margin:0;line-height:1.7;">
-          هذا الإيميل تلقائي · لا ترد على هذا الإيميل<br>
-          © 2025 WealthWise. جميع الحقوق محفوظة.
-        </p>
-      </div>
-    </div>
+              <!-- Warning -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:25px;">
+                <tr>
+                  <td style="background:#1a1207;border:1px solid #3d2e0a;border-radius:12px;padding:14px 18px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-top:2px;font-size:16px;">&#x26A0;&#xFE0F;</td>
+                        <td style="font-size:12px;color:#D4A017;line-height:1.8;padding-right:8px;font-family:'Cairo','Segoe UI',sans-serif;">
+                          اذا لم تطلب هذا الرمز، يرجى تجاهل هذا الايميل وتامين حسابك فورا.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-  </div>
+          <!-- Footer -->
+          <tr>
+            <td style="height:1px;background:linear-gradient(90deg,transparent,#222222,transparent);"></td>
+          </tr>
+          <tr>
+            <td style="padding:20px 30px 25px;text-align:center;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size:11px;color:#444444;line-height:1.8;font-family:'Cairo','Segoe UI',sans-serif;">
+                    هذا الايميل تلقائي &middot; لا ترد على هذا الايميل<br>
+                    &copy; 2025 WealthWise. جميع الحقوق محفوظة.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`
 });
