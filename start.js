@@ -10,7 +10,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(cors());
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Adjust this to your frontend URL
+  origin: 'https://wallet-wep-react.vercel.app', // Adjust this to your frontend URL
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 };
