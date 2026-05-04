@@ -4,7 +4,7 @@ const JWT=require('./middelware/JwtMake');
 const {sendEmail}=require('./middelware/sendOtp');
 const NodeCache = require("node-cache");
 const crypto = require('crypto');
-// --- Validation Helpers ---
+const QRCode = require("qrcode");
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isStrongPassword = (pw) => typeof pw === 'string' && pw.length >= 8;
 const isValidName = (name) => typeof name === 'string' && name.trim().length >= 2 && name.trim().length <= 50;
@@ -323,6 +323,26 @@ catch(err)
     }
 
 
+  const QrProfile = async (req, res) => {
+    try {
+        const email = req.user.email;
+
+        QRCode.toDataURL(email, (err, url) => {
+            if (err) {
+                console.error("Error generating QR code:", err);
+                return res.status(500).json({ message: "Failed to generate QR code" });
+            }
+            res.status(200).json({ 
+                qrCode: url,
+                email 
+            });
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
         
 
-module.exports={signup,login,profile,updateProfile,ChangePassword, walletsInfo, makeLocalWallet, getLocalWallets,sendOTPEmail};
+module.exports={signup,login,profile,updateProfile,ChangePassword, walletsInfo, makeLocalWallet, getLocalWallets,sendOTPEmail, QrProfile};

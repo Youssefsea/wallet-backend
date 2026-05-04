@@ -1,16 +1,15 @@
 const express = require('express');
 const app = express();
-const router = require('./router');
+const router = require('../router');
 const cors = require('cors');
 require('dotenv').config();
 
-// Security: limit JSON body size to prevent DoS
 app.use(express.json({ limit: '10kb' }));
 
 app.use(cors());
 
 const corsOptions = {
-  origin: 'https://wallet-wep-react.vercel.app', // Adjust this to your frontend URL
+  origin: 'https://wallet-wep-react.vercel.app', 
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 };
@@ -27,22 +26,19 @@ app.use((req, res, next) => {
 
 
 
-// API prefix
+
 app.use('/', router);
 
-// 404 handler
+
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Global error handler
+
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
   res.status(500).json({ message: 'Internal server error' });
 });
 
-const port = process.env.PORT || 3333;
 
-app.listen(port, "0.0.0.0",() => {
-  console.log(`WealthWise API running at http://localhost:${port}`);
-});
+module.exports = app;

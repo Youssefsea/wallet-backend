@@ -2,6 +2,7 @@ const pool = require('./db');
 const redisClient = require('./redisClient');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
+const QRCode = require("qrcode");
 
 
 const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
@@ -325,12 +326,14 @@ const depositToLocalWallet = async (req, res) => {
 
 
 
+
 const transfer = async (req, res) => {
-    const { toEmail, description, idempotencyKey } = req.body;
+    const { toEmail, idempotencyKey } = req.body;
+    const description = req.body.description || null;
     const amount = parseFloat(req.body.amount);
     const senderWalletId = req.user.walletId;
     const senderId = req.user.id;
-
+const catagoryID=req.body.category_id||null;
     if (isNaN(amount) || amount <= 0 || amount > 100000) {
         return res.status(400).json({ message: "Invalid amount. Must be between 0.01 and 100,000" });
     }
@@ -382,14 +385,14 @@ const transfer = async (req, res) => {
         await client.query('BEGIN ISOLATION LEVEL SERIALIZABLE');
 
         const insertSenderTxQuery = `
-            INSERT INTO transactions (wallet_id, amount, type, idempotency_key, description)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO transactions (wallet_id, amount, type, idempotency_key, description, category_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (idempotency_key) DO NOTHING
             RETURNING *;
         `;
 
         const senderTxResult = await client.query(insertSenderTxQuery, [
-            senderWalletId, -amount, 'transfer', idempotencyKey, description || null
+            senderWalletId, -amount, 'transfer', idempotencyKey, description || null, categoryID || null
         ]);
 
         if (senderTxResult.rows.length === 0) {
@@ -450,12 +453,12 @@ const transfer = async (req, res) => {
         await client.query(creditQuery, [amount, receiverWalletId]);
 
         const insertReceiverTxQuery = `
-            INSERT INTO transactions (wallet_id, amount, type, description)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO transactions (wallet_id, amount, type, description, category_id)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         `;
         await client.query(insertReceiverTxQuery, [
-            receiverWalletId, amount, 'transfer', description || null
+            receiverWalletId, amount, 'transfer', description || null, categoryID || null
         ]);
 
         await client.query('COMMIT');
