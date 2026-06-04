@@ -1,136 +1,136 @@
-const pool=require('./db');
-const bcrypt=require('bcrypt');
-const JWT=require('./middelware/JwtMake');
-const {sendEmail}=require('./middelware/sendOtp');
-const NodeCache = require("node-cache");
+const pool = require('./db');
+const bcrypt = require('bcrypt');
+const JWT = require('./middelware/JwtMake');
+const { sendEmail } = require('./middelware/sendOtp');
+const NodeCache = require('node-cache');
 const crypto = require('crypto');
-const QRCode = require("qrcode");
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const isStrongPassword = (pw) => typeof pw === 'string' && pw.length >= 8;
-const isValidName = (name) => typeof name === 'string' && name.trim().length >= 2 && name.trim().length <= 50;
-
-
-
-const otpCache = new NodeCache({ stdTTL: 60, checkperiod: 10 });
-
-const sendOTPEmail = async(req,res) => {
+ 
+const isValidEmail    = (e)  => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+const isStrongPassword= (pw) => typeof pw === 'string' && pw.length >= 8;
+const isValidName     = (n)  => typeof n  === 'string' && n.trim().length >= 2 && n.trim().length <= 50;
+const isValidOtp      = (o)  => typeof o  === 'string' && /^\d{6}$/.test(o);
+ 
+const otpCache = new NodeCache({ stdTTL: 600, checkperiod: 60 });
+ 
+const sendRateLimit = new NodeCache({ stdTTL: 60, checkperiod: 30 });
+const MAX_OTP_SENDS_PER_MINUTE = 3;
+ 
+const sendOTPEmail = async (req, res) => {
   try {
-    console.log("Send OTP request received:", req.body);
-    
-    const {email} = req.body;
-    
-    if (!email ) {
-      return res.status(400).json({ 
-        message: "Email is required" 
-      });
+    const { email } = req.body;
+ 
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
     }
-    
-    const result = await pool.query(
-      "SELECT id FROM users WHERE email = $1 ",
-      [email]
+ 
+    const normalizedEmail = email.toLowerCase().trim();
+ 
+    const sendCount = sendRateLimit.get(normalizedEmail) || 0;
+    if (sendCount >= MAX_OTP_SENDS_PER_MINUTE) {
+      return res.status(429).json({ message: 'Too many requests. Please wait a minute and try again.' });
+    }
+    sendRateLimit.set(normalizedEmail, sendCount + 1);
+ 
+    const { rows } = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [normalizedEmail]
     );
-    
-    const existing = result.rows;
-    if (existing.length > 0) {
-      return res.status(409).json({ 
-        message: "Email already exists" 
-      });
+    if (rows.length > 0) {
+      return res.status(409).json({ message: 'Email already exists' });
     }
-    
-    // Generate OTP
+ 
     const otp = crypto.randomInt(100000, 999999).toString();
-    console.log(`Generated OTP for ${email}: ${otp}`);
-    
-    otpCache.set(email, otp);
-    
-    await sendEmail(email, otp);
-    console.log(`OTP sent successfully to ${email}`);
-    
-    return res.status(200).json({ 
-      message: "OTP sent to your email successfully" 
-    });
-    
-  } catch(err) {
-    console.error("Error in sendOTPEmail:", err);
-    
-    // More specific error messages
-    if (err.message.includes('connect ECONNREFUSED')) {
-      return res.status(500).json({ 
-        message: "Database connection failed" 
-      });
-    }
-    
-    if (err.message.includes('Invalid login')) {
-      return res.status(500).json({ 
-        message: "Email service configuration error" 
-      });
-    }
-    
-    return res.status(500).json({ 
-      message: "Failed to send OTP. Please try again." 
-    });
+    otpCache.set(normalizedEmail, { otp, attempts: 0 });
+ 
+    await sendEmail(normalizedEmail, otp);
+    console.log(`OTP sent to ${normalizedEmail}`);
+ 
+    return res.status(200).json({ message: 'OTP sent to your email successfully' });
+ 
+  } catch (err) {
+    console.error('Error in sendOTPEmail:', err);
+    return res.status(500).json({ message: 'Failed to send OTP. Please try again.' });
   }
 };
-
-
-
-const signup=async(req,res)=>
-    {
-            const client = await pool.connect();
-
-        try
-        {
-            await client.query('BEGIN');
-const {name,email,password,otp}=req.body;
- const storedOtp = otpCache.get(email);
- if (!storedOtp || storedOtp !== otp) {
-  return res.status(400).send({ message: "Invalid or expired OTP" });
-}
-   otpCache.del(email);
-console.log('Signup Request:', {name, email}); // Debug log
-
-if (!name || !isValidName(name)) {
-    await client.query('ROLLBACK');
-    return res.status(400).json({message:'Name must be between 2 and 50 characters'});
-}
-if (!email || !isValidEmail(email)) {
-    await client.query('ROLLBACK');
-    return res.status(400).json({message:'Invalid email format'});
-}
-if (!password || !isStrongPassword(password)) {
-    await client.query('ROLLBACK');
-    return res.status(400).json({message:'Password must be at least 8 characters'});
-}
-
-const userExit=await client.query('SELECT email FROM users WHERE email=$1',[email.toLowerCase().trim()]);
-
-if(userExit.rows.length>0)
-{
-    await client.query('ROLLBACK');
-    return res.status(409).json({message:'User already exists'});
-}
-const hashedPassword=await bcrypt.hash(password.toString(),12);
-
-
-
-const newUser=await client.query('INSERT INTO users (name,email,password) VALUES ($1,$2,$3) RETURNING id, name, email, created_at',[name.trim(),email.toLowerCase().trim(),hashedPassword]);
-
-const makeNewWallet=await client.query('INSERT INTO wallets (user_id,balance) VALUES ($1,$2) RETURNING *',[newUser.rows[0].id,0.00]);
-
-await client.query('COMMIT');
-res.status(201).json({message:'User created successfully',user:newUser.rows[0],wallet:makeNewWallet.rows[0]});
-
-        }catch(err)
-        {
-          await client.query('ROLLBACK');
-            console.error(err);
-            res.status(500).json({message:'Internal server error'});
-        }
-        finally
-        {
-          if (client) client.release();
-        }
-    };
+ 
+const signup = async (req, res) => {
+  let client;
+  try {
+    const { name, email, password, otp } = req.body;
+ 
+    if (!name || !isValidName(name)) {
+      return res.status(400).json({ message: 'Name must be between 2 and 50 characters' });
+    }
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+    if (!password || !isStrongPassword(password)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
+    }
+    if (!otp || !isValidOtp(otp)) {
+      return res.status(400).json({ message: 'OTP must be a 6-digit number' });
+    }
+ 
+    const normalizedEmail = email.toLowerCase().trim();
+ 
+    const cached = otpCache.get(normalizedEmail);
+ 
+    if (!cached) {
+      return res.status(400).json({ message: 'OTP expired or not requested' });
+    }
+ 
+    if (cached.attempts >= 5) {
+      otpCache.del(normalizedEmail);
+      return res.status(400).json({ message: 'Too many failed attempts. Please request a new OTP.' });
+    }
+ 
+    if (cached.otp !== otp) {
+      otpCache.set(normalizedEmail, { ...cached, attempts: cached.attempts + 1 });
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+ 
+    otpCache.del(normalizedEmail);
+ 
+    client = await pool.connect();
+    await client.query('BEGIN');
+ 
+    const { rows: existing } = await client.query(
+      'SELECT id FROM users WHERE email = $1',
+      [normalizedEmail]
+    );
+    if (existing.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+ 
+    const hashedPassword = await bcrypt.hash(password.toString(), 12);
+ 
+    const { rows: newUser } = await client.query(
+      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
+      [name.trim(), normalizedEmail, hashedPassword]
+    );
+ 
+    const { rows: newWallet } = await client.query(
+      'INSERT INTO wallets (user_id, balance) VALUES ($1, $2) RETURNING *',
+      [newUser[0].id, 0.00]
+    );
+ 
+    await client.query('COMMIT');
+ 
+    return res.status(201).json({
+      message: 'User created successfully',
+      user:    newUser[0],
+      wallet:  newWallet[0],
+    });
+ 
+  } catch (err) {
+    if (client) await client.query('ROLLBACK').catch(() => {});
+    console.error('Error in signup:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    if (client) client.release();
+  }
+};
 
 
     const  login=async(req,res)=>

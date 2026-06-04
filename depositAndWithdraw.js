@@ -23,7 +23,7 @@ const deposit = async (req, res) => {
     const lockKey = `lock:wallet:${walletId}`;
     const requestId = idempotencyKey; 
 
-    const acquiredLock = await redisClient.set(lockKey, requestId, { NX: true, EX: 10 });
+    const acquiredLock = await redisClient.set(lockKey, requestId, { nx: true, ex: 10 });
     
     if (!acquiredLock) {
         return res.status(409).json({ message: "Request already in progress. Please wait." });
@@ -118,7 +118,7 @@ const category_id = req.body.category_id||null;
     const lockKey = `lock:wallet:${walletId}`;
     const requestId = idempotencyKey;
 
-    const acquiredLock = await redisClient.set(lockKey, requestId, { NX: true, EX: 10 });
+    const acquiredLock = await redisClient.set(lockKey, requestId, { nx: true, ex: 10 });
 
     if (!acquiredLock) {
         return res.status(409).json({ message: "Request already in progress. Please wait." });
@@ -241,7 +241,7 @@ const depositToLocalWallet = async (req, res) => {
     const lockKey = `lock:wallet:${walletId}`;
     const requestId = idempotencyKey; 
 
-    const acquiredLock = await redisClient.set(lockKey, requestId, { NX: true, EX: 10 });
+    const acquiredLock = await redisClient.set(lockKey, requestId, { nx: true, ex: 10 });
     
     if (!acquiredLock) {
         return res.status(409).json({ message: "Request already in progress. Please wait." });
@@ -368,12 +368,12 @@ const catagoryID=req.body.category_id||null;
     const lockKey2 = `lock:wallet:${secondLockId}`;
     const requestId = idempotencyKey;
 
-    const lock1 = await redisClient.set(lockKey1, requestId, { NX: true, EX: 10 });
+    const lock1 = await redisClient.set(lockKey1, requestId, { nx: true, ex: 10 });
     if (!lock1) {
         return res.status(409).json({ message: "Request already in progress. Please wait." });
     }
 
-    const lock2 = await redisClient.set(lockKey2, requestId, { NX: true, EX: 10 });
+    const lock2 = await redisClient.set(lockKey2, requestId, { nx: true, ex: 10 });
     if (!lock2) {
         await redisClient.del(lockKey1);
         return res.status(409).json({ message: "Request already in progress. Please wait." });
@@ -1053,4 +1053,4 @@ const aiTransaction = async (req, res) => {
 
 
 
-module.exports = { deposit, withdraw, transfer, transfersHistory, gettransferDetailsById,getLocalWalletTransactionDetailsById,transferHistoryForLocalWallet, manualTransaction, parseExpense, aiTransaction,depositToLocalWallet };
+module.exports = { deposit, withdraw, transfer, transfersHistory, gettransferDetailsById,getLocalWalletTransactionDetailsById,transferHistoryForLocalWallet, manualTransaction, parseExpense, aiTransaction,depositToLocalWallet }; 
