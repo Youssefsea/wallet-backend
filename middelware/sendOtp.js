@@ -210,7 +210,7 @@ function buildEmailHTML(OTP) {
 async function sendEmail(to, OTP) {
   try {
     const { data, error } = await resend.emails.send({
-      from: "WealthWise <onboarding@resend.dev>", // غيّر للدومين الخاص بك بعد التحقق منه في Resend
+      from: 'noreply@httpsfood-front-rho.me', // غيّر للدومين الخاص بك بعد التحقق منه في Resend
       to,
       subject: "رمز التحقق - WealthWise",
       html: buildEmailHTML(OTP),
