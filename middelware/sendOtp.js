@@ -38,67 +38,72 @@ function buildEmailHTML(OTP) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <meta name="x-apple-disable-message-reformatting">
   <title>رمز التحقق - WealthWise</title>
   <style>
+    /* تحسينات إضافية للهواتف لضمان التوسيط الكامل */
     @media screen and (max-width: 600px) {
-      .email-container {
-        width: 100% !important;
-      }
       .content-padding {
-        padding: 30px 20px 20px 20px !important;
+        padding: 24px 16px !important;
       }
       .title-text {
-        font-size: 24px !important;
+        font-size: 22px !important;
       }
-      .body-text {
-        font-size: 15px !important;
+      .otp-space {
+        padding: 16px 10px !important;
       }
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:'Cairo','Segoe UI',Tahoma,sans-serif;direction:rtl;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:'Segoe UI',Tahoma,sans-serif;direction:rtl;-webkit-text-smoothing:antialiased;width:100% !important;">
 
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f4f6f8;padding:40px 16px;">
+  <!-- الخلفية الكاملة للإيميل -->
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f4f6f8;width:100%;">
     <tr>
-      <td align="center">
+      <td align="center" style="padding:32px 12px;">
         
-        <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+        <!-- الحاوية الرئيسية: تم تغيير width إلى 100% لتناسب الموبايل، و max-width لمنع التمدد على الكمبيوتر -->
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:500px; width:100%; background-color:#ffffff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden; margin:0 auto;">
 
+          <!-- ── الشعار ── -->
           <tr>
-            <td align="center" style="padding:32px 20px 0;">
-              <span style="font-size:18px;color:#0a2540;letter-spacing:1px;font-weight:900;font-family:'Cairo',sans-serif;">
+            <td align="center" style="padding:32px 20px 10px;">
+              <span style="font-size:18px; color:#0a2540; font-weight:900; letter-spacing:1px;">
                 WEALTHWISE
               </span>
             </td>
           </tr>
 
+          <!-- ── المحتوى ── -->
           <tr>
-            <td class="content-padding" style="padding:32px 40px 40px;text-align:center;">
+            <td class="content-padding" style="padding:24px 32px 32px; text-align:center;" align="center">
               
-              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 20px;">
+              <!-- أيقونة مبسطة -->
+              <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 16px;">
                 <tr>
-                  <td style="width:64px;height:64px;background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:50%;text-align:center;vertical-align:middle;font-size:24px;line-height:64px;">
+                  <td align="center" style="width:56px; height:56px; background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:50%; font-size:24px; line-height:56px; text-align:center; vertical-align:middle;">
                     🔒
                   </td>
                 </tr>
               </table>
 
-              <h1 class="title-text" style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0a2540;font-family:'Cairo',sans-serif;">
+              <h1 class="title-text" style="margin:0 0 12px; font-size:24px; font-weight:800; color:#0a2540;">
                 التحقق من الهوية
               </h1>
               
-              <p class="body-text" style="margin:0 0 32px;font-size:16px;color:#475569;line-height:1.6;font-family:'Cairo',sans-serif;">
+              <p style="margin:0 0 28px; font-size:15px; color:#475569; line-height:1.6;">
                 مرحباً بك،<br>
                 لقد تلقينا طلباً للتحقق من هويتك. يرجى استخدام الرمز أدناه لإكمال العملية.
               </p>
 
-              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc;border-radius:8px;border:1px dashed #cbd5e1;margin-bottom:24px;">
+              <!-- مربع الرمز (OTP) - تم إضافة align="center" صريحة وإلغاء الـ letter-spacing لمنع اختفاء الحروف -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" align="center" style="background-color:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1; margin-bottom:20px; width:100%;">
                 <tr>
-                  <td style="padding:24px 20px;text-align:center;">
-                    <p style="margin:0 0 16px;font-size:12px;color:#64748b;font-weight:600;letter-spacing:1px;">رمز التحقق الخاص بك</p>
+                  <td class="otp-space" style="padding:24px 16px; text-align:center;" align="center">
+                    <p style="margin:0 0 16px; font-size:12px; color:#64748b; font-weight:600;">رمز التحقق الخاص بك</p>
                     
-                    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;font-size:28px;font-weight:800;color:#0f172a;letter-spacing:6px;font-family:monospace;" dir="ltr">
+                    <!-- جدول أرقام الرمز المستدعى من الدالة -->
+                    <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto; font-size:26px; font-weight:800; color:#0f172a; font-family:monospace;" dir="ltr">
                       <tr>${otpDigits}</tr>
                     </table>
 
@@ -106,20 +111,18 @@ function buildEmailHTML(OTP) {
                 </tr>
               </table>
 
-              <p style="margin:0 0 32px;font-size:14px;color:#64748b;font-family:'Cairo',sans-serif;font-weight:600;">
+              <!-- وقت الصلاحية -->
+              <p style="margin:0 0 28px; font-size:13px; color:#64748b; font-weight:600;">
                 ⏱ صالح لمدة <span style="color:#0a2540;">10 دقائق</span> فقط
               </p>
 
+              <!-- التنبيه الأمني -->
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td style="background-color:#fffbeb;border-right:3px solid #fbbf24;border-radius:4px;padding:16px;text-align:right;">
-                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                      <tr>
-                        <td style="font-size:13px;color:#92400e;line-height:1.6;font-family:'Cairo',sans-serif;">
-                          <strong>ملاحظة أمنية:</strong> إذا لم تقم بطلب هذا الرمز، يُرجى تجاهل هذه الرسالة وتأمين حسابك فوراً. نحن لا نطلب منك كلمة المرور أو هذا الرمز أبداً.
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="background-color:#fffbeb; border-right:3px solid #fbbf24; border-radius:4px; padding:12px 16px; text-align:right;" align="right">
+                    <p style="margin:0; font-size:12px; color:#92400e; line-height:1.6;">
+                      <strong>ملاحظة أمنية:</strong> إذا لم تطلب هذا الرمز، يُرجى تجاهل هذه الرسالة وتأمين حسابك فوراً.
+                    </p>
                   </td>
                 </tr>
               </table>
@@ -127,13 +130,14 @@ function buildEmailHTML(OTP) {
             </td>
           </tr>
 
+          <!-- ── الفوتر ── -->
           <tr>
-            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 40px;text-align:center;">
-              <p style="margin:0 0 8px;font-size:12px;color:#64748b;font-family:'Cairo',sans-serif;">
+            <td style="background-color:#f8fafc; border-top:1px solid #e2e8f0; padding:20px; text-align:center;" align="center">
+              <p style="margin:0 0 6px; font-size:11px; color:#64748b;">
                 هذه رسالة تلقائية، يُرجى عدم الرد عليها.
               </p>
-              <p style="margin:0;font-size:11px;color:#94a3b8;font-family:monospace;letter-spacing:1px;text-transform:uppercase;">
-                © 2025 WealthWise. All Rights Reserved.
+              <p style="margin:0; font-size:10px; color:#94a3b8; font-family:monospace; letter-spacing:1px;">
+                © 2026 WEALTHWISE. ALL RIGHTS RESERVED.
               </p>
             </td>
           </tr>
