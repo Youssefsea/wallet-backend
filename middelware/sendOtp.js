@@ -256,7 +256,7 @@ WEALTHWISE
   style="
     margin:0 auto;
     max-width:100%;
-    font-family: Arial, Helvetica, sans-serif;
+ font-family: 'Courier New', monospace;
   "
   dir="ltr"
 >
